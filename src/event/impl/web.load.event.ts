@@ -1,20 +1,21 @@
+import {LoadEvent} from "../load.event.ts"
 import {inject, injectable} from "inversify"
-import {ManageStorageData} from "../storage/manage.storage.data"
-import {FindBrowserInfo} from "../browserinfo/find.browser.info"
-import {ManageConversionInfo} from "../conversion/manage.conversion.info"
-import PAGE_ACTIVITY_TYPE from "../enums/page.activity.type"
-import {SendHttpRequest} from "../sendhttprequest/send.http.request"
-import {findApiKeyHeader} from "../util"
-import {BrowserInfoDto} from "../dtos"
+import {ManageStorageData} from "../../storage/manage.storage.data.ts"
+import {FindBrowserInfo} from "../../browserinfo/find.browser.info.ts"
+import {SendHttpRequest} from "../../sendhttprequest/send.http.request.ts"
+import {ManageConversionInfo} from "../../conversion/manage.conversion.info.ts"
+import {BrowserInfoDto} from "../../dtos"
+import {findApiKeyHeader} from "../../util"
+import PAGE_ACTIVITY_TYPE from "../../enums/page.activity.type.ts"
 
 @injectable()
-export class LoadEventDetail {
+export class WebLoadEvent implements LoadEvent {
   @inject('ManageStorageData') private manageStorageData!: ManageStorageData
   @inject('FindBrowserInfo') private findBrowserInfo!: FindBrowserInfo
   @inject('SendHttpRequest') private sendHttpRequest!: SendHttpRequest
   @inject('ManageConversionInfo') private manageConversionInfo!: ManageConversionInfo
 
-  onLoad() {
+  onload(): void {
     this.#setBasicInfo()
     this.#updateInCompleteLogInfo()
     this.#execChkConversion()
@@ -22,7 +23,7 @@ export class LoadEventDetail {
   }
 
   #setBasicInfo() {
-    this.manageStorageData.setBrowserId(this.manageStorageData.findCurrentHostName() ?? "")
+    this.manageStorageData.setBrowserId(window.location.hostname)
   }
 
   #updateInCompleteLogInfo() {
@@ -44,7 +45,7 @@ export class LoadEventDetail {
         nextUrl: browserInfoDto.pageUrl,
         prevUrl: incompleteLogInfo.pageUrl,
         browserId: incompleteLogInfo.browserId,
-        domain: this.manageStorageData.findCurrentHostName() ?? "",
+        domain: window.location.hostname,
       }
 
       if (data.prevUrl !== data.nextUrl) {

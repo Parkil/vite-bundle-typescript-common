@@ -72,8 +72,8 @@ export class ManageStorageData {
     this.#storage.removeItem(RECOBLE_INCOMPLETE_LOG_INFO_KEY)
   }
 
-  setPageActivity(activityType: PAGE_ACTIVITY_TYPE, value: number | boolean): void {
-    let storeData = this.findPageActivity()
+  setPageActivity(activityType: PAGE_ACTIVITY_TYPE, value: string | boolean): void {
+    let storeData:PageActivity = this.findPageActivity()
     const typeStr: string = activityType.toString()
 
     // @ts-ignore

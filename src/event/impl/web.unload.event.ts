@@ -1,56 +1,60 @@
+import {UnloadEvent} from "../unload.event.ts"
 import {inject, injectable} from "inversify"
-import {PageActivity} from "../types/page.activity"
-import {ManageStorageData} from "../storage/manage.storage.data"
-import {ChkMeetsConversion} from "../conversion/chk.meets.conversion"
-import {Conversion, LogData} from "../types/log.data"
-import {ManageLogData} from "../logdata/manage.log.data.ts"
-import {UNLOAD_ENUM} from "../enums/unload.type.ts"
-import {formatDate} from "../util";
+import {ManageStorageData} from "../../storage/manage.storage.data.ts"
+import {ChkMeetsConversion} from "../../conversion/chk.meets.conversion.ts"
+import {SendHttpRequest} from "../../sendhttprequest/send.http.request.ts"
+import {ScrappingReview} from "../../scrapping/scrapping.review.ts"
+import {UNLOAD_ENUM} from "../../enums/unload.type.ts"
+import {calcScrollLoc, findApiKeyHeader, formatDate} from "../../util"
+import PAGE_ACTIVITY_TYPE from "../../enums/page.activity.type.ts"
+import {PageActivity} from "../../types/page.activity"
 
 @injectable()
-export class UnLoadEventDetail {
+export class WebUnloadEvent implements UnloadEvent {
   @inject('ManageStorageData') private manageStorageData!: ManageStorageData
   @inject('ChkMeetsConversion') private chkMeetsConversion!: ChkMeetsConversion
-  @inject('ManageLogData') private manageLogData!: ManageLogData
+  @inject('SendHttpRequest') private sendHttpRequest!: SendHttpRequest
+  @inject('ScrappingReview') private scrappingReview!: ScrappingReview
 
-  onUnLoad(currentUrl: string, unloadType: UNLOAD_ENUM = UNLOAD_ENUM.PAGE_UNMOUNT) {
-
-    if (unloadType === UNLOAD_ENUM.PAGE_UNLOAD && this.manageStorageData.findUnloadEventExecuted() === 'true') {
+  onUnload(_: string, __: UNLOAD_ENUM) {
+    // window sessionStorage 가 비동기 상황에서 정상적으로 작동하지 않는다
+    if (this.manageStorageData.findUnloadEventExecuted() === 'true') {
       return
     }
 
+    this.manageStorageData.setPageActivity(PAGE_ACTIVITY_TYPE.SCROLL, calcScrollLoc())
     // todo 전환정보 충족여부 확인 (현재는 임시 구현이며 나중에 변경될 수 있다)
     this.chkMeetsConversion.check()
-    const logData = this.#assemblyData(currentUrl)
-    this.manageLogData.addLog(logData, unloadType).then(() => {})
-    this.manageStorageData.clearUserData(currentUrl)
-    this.manageStorageData.clearReviewListStr()
 
-    if (unloadType === UNLOAD_ENUM.PAGE_UNLOAD) {
-      this.manageStorageData.setUnloadEventExecuted()
-    }
+    const data = this.#assemblyData()
+    const userAgent = this.manageStorageData.findBrowserInfo()['userAgent']
+
+    const apiKeyHeader = findApiKeyHeader()
+
+    this.sendHttpRequest.sendLog(data, userAgent, apiKeyHeader)
+      .then(() => {})
+
+    this.manageStorageData.setIncompleteLogInfo(this.manageStorageData.findBrowserId(), window.location.href)
+    this.manageStorageData.setUnloadEventExecuted()
+    this.manageStorageData.clearUserData()
   }
 
-  #assemblyData(currentUrl: string): LogData {
+  #assemblyData(): object {
     const browserInfo: Record<string, any> = this.manageStorageData.findBrowserInfo()
-    browserInfo['pageUrl'] = currentUrl
-
     const activityData: PageActivity = this.manageStorageData.findPageActivity()
-    const userData: Record<string, any> = this.manageStorageData.findUserData(currentUrl)
+    const userData: Record<string, any> = this.manageStorageData.findUserData()
 
     const loginAccount = userData.loginAccount
+    const reviewSelector = userData.reviewSelector
     const searchWord = userData.searchWord
     const pageName = userData.pageName
 
     let reviewList = null
-    const reviewListStr = this.manageStorageData.findReviewListStr()
 
-    if (reviewListStr) {
-      reviewList = reviewListStr.split('|')
+    if (reviewSelector) {
+      reviewList = this.scrappingReview.findReviewContents(
+        reviewSelector['list_area_selector'], reviewSelector['row_contents_selector'], document)
     }
-
-    const scrollLoc = this.manageStorageData.findScrollLoc() ?? '0'
-
 
     const conversion = this.#assemblyConversion()
 
@@ -65,7 +69,7 @@ export class UnLoadEventDetail {
       pageEndDtm: null,
       pageActivity: {
         view: activityData.VIEW,
-        scroll: scrollLoc,
+        scroll: activityData.SCROLL,
         click: activityData.CLICK,
       },
       pageMoveType: {
@@ -78,7 +82,7 @@ export class UnLoadEventDetail {
     }
   }
 
-  #assemblyConversion(): Conversion | null {
+  #assemblyConversion() {
     const userData: Record<string, any> = this.manageStorageData.findUserData()
 
     const registerUser = userData.user
