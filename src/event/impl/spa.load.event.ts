@@ -20,6 +20,7 @@ export class SpaLoadEvent implements LoadEvent {
 
   #setBasicInfo() {
     this.manageStorageData.setBrowserId(window.location.hostname)
+    this.manageStorageData.setPageStartDtm(new Date())
   }
 
   #updateInCompleteLogInfo() {

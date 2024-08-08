@@ -1,6 +1,6 @@
 import {inject, injectable} from "inversify"
 import {IndexedDbWrapper} from "../indexeddb/indexed.db.wrapper.ts"
-import {INDEXED_DB_LAST_LOG, INDEXED_DB_LOG_DETAIL} from "../constants/constants.ts"
+import {INDEXED_DB_LAST_LOG, INDEXED_DB_LOG_DETAIL, LOG_SERVER_SEND_LOGS_URL} from "../constants/constants.ts"
 import {findApiKeyHeader, printErrorMsg} from "../util"
 import {SetCompleteInfo} from "./set.complete.info.ts"
 import {LogData} from "../types/log.data"
@@ -61,7 +61,7 @@ export class ManageLogData {
         await this.indexedDbWrapper.clearAll(database, INDEXED_DB_LAST_LOG)
       }
 
-      await this.sendHttpRequest.sendLog(completeList, userAgentStr, apiKeyHeader)
+      await this.sendHttpRequest.sendLog(LOG_SERVER_SEND_LOGS_URL, completeList, userAgentStr, apiKeyHeader)
     }
   }
 

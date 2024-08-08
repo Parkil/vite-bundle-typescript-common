@@ -25,8 +25,8 @@ describe('manageLogData', () => {
   beforeAll(async () => {
     manageLogData = container.get<ManageLogData>('ManageLogData')
 
-    sendLogMock = mockFunction(SendHttpRequest.prototype, 'sendLog', async (data, userAgent, apiKey) => {
-      console.log('sendLog param : ', data, '/', userAgent, '/', apiKey)
+    sendLogMock = mockFunction(SendHttpRequest.prototype, 'sendLog', async (url, data, userAgent, apiKey) => {
+      console.log('sendLog param : ', url, '/', data, '/', userAgent, '/', apiKey)
     })
 
     mockFunction(ManageStorageData.prototype, 'findApiKey', () => {
@@ -38,6 +38,7 @@ describe('manageLogData', () => {
     jest.restoreAllMocks()
   })
 
+  // async block testcase 간에는 실행순서가 보장되지 않는다(= 상위 테스트 케이스가 완료되기전에 다음 테스트 케이스가 실행된다)
   test('capacity 에 저장된 로그 개수가 미치지 못하는 경우', async () => {
     await manageLogData.addLog(addLogParam_1, UNLOAD_ENUM.PAGE_UNMOUNT_TEST)
 
@@ -49,7 +50,7 @@ describe('manageLogData', () => {
     await manageLogData.addLog(addLogParam_2, UNLOAD_ENUM.PAGE_UNMOUNT_TEST)
 
     expect(sendLogMock).toHaveBeenCalledTimes(1)
-    expect(sendLogMock).toBeCalledWith(sendLogParam_1_data, sendLogParam_1_userAgent, sendLogParam_1_apiHeader)
+    expect(sendLogMock).toBeCalledWith("http://localhost:3001/send_logs", sendLogParam_1_data, sendLogParam_1_userAgent, sendLogParam_1_apiHeader)
   })
 
   test('capacity 2회 달성', async () => {
@@ -59,7 +60,7 @@ describe('manageLogData', () => {
     await manageLogData.addLog(addLogParam_2, UNLOAD_ENUM.PAGE_UNMOUNT_TEST)
 
     expect(sendLogMock).toHaveBeenCalledTimes(2)
-    expect(sendLogMock).toBeCalledWith(sendLogParam_1_data, sendLogParam_1_userAgent, sendLogParam_1_apiHeader)
-    expect(sendLogMock).toBeCalledWith(sendLogParam_2_data, sendLogParam_2_userAgent, sendLogParam_2_apiHeader)
+    expect(sendLogMock).toBeCalledWith("http://localhost:3001/send_logs", sendLogParam_1_data, sendLogParam_1_userAgent, sendLogParam_1_apiHeader)
+    expect(sendLogMock).toBeCalledWith("http://localhost:3001/send_logs", sendLogParam_2_data, sendLogParam_2_userAgent, sendLogParam_2_apiHeader)
   })
 })

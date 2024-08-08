@@ -76,7 +76,7 @@ const isScriptInserted = (): boolean => {
   return isScriptInserted
 }
 
-export const insertScript = () => {
+export const insertSpaPageCloseEventScript = () => {
 
   if (isScriptInserted()) {
     return
@@ -90,3 +90,6 @@ export const insertScript = () => {
   document.head.appendChild(script)
 }
 
+export const errorMsg = (msg: string) => {
+  printErrorMsg(msg)
+}

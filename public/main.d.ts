@@ -16,5 +16,9 @@ export declare const saveHostName: (hostname: string) => void;
 
 export declare const saveUserData: (paramArr: { [key: string]: any }[]) => void;
 
-export declare const insertScript: (data: string) => void;
+export declare const insertSpaPageCloseEventScript: () => void;
+
+export declare const errorMsg: (msg: string) => void;
+
+
 

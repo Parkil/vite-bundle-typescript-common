@@ -8,6 +8,7 @@ import {UNLOAD_ENUM} from "../../enums/unload.type.ts"
 import {calcScrollLoc, findApiKeyHeader, formatDate} from "../../util"
 import PAGE_ACTIVITY_TYPE from "../../enums/page.activity.type.ts"
 import {PageActivity} from "../../types/page.activity"
+import {LOG_SERVER_SEND_LOG_URL} from "../../constants/constants.ts";
 
 @injectable()
 export class WebUnloadEvent implements UnloadEvent {
@@ -30,9 +31,7 @@ export class WebUnloadEvent implements UnloadEvent {
     const userAgent = this.manageStorageData.findBrowserInfo()['userAgent']
 
     const apiKeyHeader = findApiKeyHeader()
-
-    this.sendHttpRequest.sendLog(data, userAgent, apiKeyHeader)
-      .then(() => {})
+    this.sendHttpRequest.sendLog(LOG_SERVER_SEND_LOG_URL, data, userAgent, apiKeyHeader).then(() => {})
 
     this.manageStorageData.setIncompleteLogInfo(this.manageStorageData.findBrowserId(), window.location.href)
     this.manageStorageData.setUnloadEventExecuted()
