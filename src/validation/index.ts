@@ -1,0 +1,1 @@
+export {validateMultiParam} from "./validation"
