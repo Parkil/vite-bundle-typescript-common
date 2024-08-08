@@ -1,8 +1,8 @@
 import HTTP_METHOD from "../enums/http.method"
 import axios, {AxiosResponse} from "axios"
 import {HttpsAgent} from "agentkeepalive"
-import {printErrorMsg} from "../util"
 import {injectable} from "inversify"
+import {printErrorObj} from "../util/msg.util.ts"
 
 @injectable()
 export class AxiosClient {
@@ -20,7 +20,6 @@ export class AxiosClient {
   private send(url: string, method: HTTP_METHOD, headers: Record<string, string>, data?: object): Promise<AxiosResponse<any, any>> {
     const baseConfig = {
       httpsAgent: this.axiosHttpsAgent,
-      httpAgent: this.axiosHttpsAgent,
       url: url,
       method: method.toString(),
       timeout: 6000,
@@ -37,7 +36,7 @@ export class AxiosClient {
       const resp = await this.send(url, method, headers, data)
       return resp.data
     } catch (e) {
-      printErrorMsg(e)
+      printErrorObj(e)
     }
   }
 }

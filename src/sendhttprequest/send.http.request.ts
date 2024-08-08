@@ -6,15 +6,13 @@ import {XhrClient} from "../httpclient/xhr.client"
 
 @injectable()
 export class SendHttpRequest {
-  @inject('AxiosClient') private axiosClient: AxiosClient
-  @inject('XhrClient') private xhrClient: XhrClient
+  @inject('AxiosClient') private axiosClient!: AxiosClient
+  @inject('XhrClient') private xhrClient!: XhrClient
 
   async sendLog(data: any, userAgent: string, headers: Record<string, string>): Promise<any> {
     if (userAgent.toLowerCase().indexOf('firefox') !== -1) {
-      console.log('xhr request')
       return this.xhrClient.sendRequest(LOG_SERVER_SEND_LOG_URL, HTTP_METHOD.POST, headers, data)
     } else{
-      console.log('axios request')
       return this.axiosClient.sendRequest(LOG_SERVER_SEND_LOG_URL, HTTP_METHOD.POST, headers, data)
     }
   }

@@ -22,7 +22,7 @@ export class LoadEventDetail {
   }
 
   #setBasicInfo() {
-    this.manageStorageData.setBrowserId(window.location.hostname)
+    this.manageStorageData.setBrowserId(this.manageStorageData.findCurrentHostName() ?? "")
   }
 
   #updateInCompleteLogInfo() {
@@ -44,7 +44,7 @@ export class LoadEventDetail {
         nextUrl: browserInfoDto.pageUrl,
         prevUrl: incompleteLogInfo.pageUrl,
         browserId: incompleteLogInfo.browserId,
-        domain: window.location.hostname,
+        domain: this.manageStorageData.findCurrentHostName() ?? "",
       }
 
       if (data.prevUrl !== data.nextUrl) {

@@ -1,6 +1,6 @@
 import {ValidateOptionDto, ValidateParamResultDto} from "../../dtos"
 import VALIDATE_ERROR_TYPE from "../../enums/validate.error.type"
-import {ValidateOptionRecord, ValidateTargetRecord} from "../../types/validation.type"
+import {ValidateOptionRecord, ValidateTargetRecord} from "../../types/validation"
 
 export class InvalidKeyValidator {
   static isValid(option: ValidateOptionRecord, target: ValidateTargetRecord): ValidateParamResultDto {

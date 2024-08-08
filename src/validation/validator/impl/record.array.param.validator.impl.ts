@@ -1,7 +1,7 @@
 import {ValidateOptionDto, ValidateParamResultDto} from "../../../dtos"
 import {ParamValidator} from "../param.validator"
 import VALIDATE_ERROR_TYPE from "../../../enums/validate.error.type"
-import {ValidateElementOptionRecord, ValidateTargetParam} from "../../../types/validation.type"
+import {ValidateElementOptionRecord, ValidateTargetParam} from "../../../types/validation"
 import {validateMultiParam} from "../../validation"
 
 export class RecordArrayParamValidatorImpl implements ParamValidator {

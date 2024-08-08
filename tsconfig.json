@@ -5,10 +5,15 @@
     "module": "ESNext",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
+    "experimentalDecorators": true, // inversify 에서 필요
+    "emitDecoratorMetadata": true, // inversify 에서 필요
+    // @abraham/reflection (inversify 에서 필요), vite/client (import.meta.env type 정의)
+    "types": ["@abraham/reflection", "vite/client"],
 
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
@@ -17,7 +22,10 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+
+    "declaration": true,
+    "esModuleInterop": true,
   },
   "include": ["src"]
 }

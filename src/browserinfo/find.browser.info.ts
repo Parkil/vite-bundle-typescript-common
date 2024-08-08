@@ -6,7 +6,7 @@ import {SendHttpRequest} from "../sendhttprequest/send.http.request"
 @injectable()
 export class FindBrowserInfo {
 
-  @inject('SendHttpRequest') private sendHttpRequest: SendHttpRequest
+  @inject('SendHttpRequest') private sendHttpRequest!: SendHttpRequest
 
   async findInfo(): Promise<BrowserInfoDto> {
     let userAgent = ''

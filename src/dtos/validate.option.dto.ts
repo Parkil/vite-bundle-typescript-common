@@ -1,5 +1,5 @@
 import DATA_TYPE from "../enums/data.type"
-import {ValidateElementOptionRecord} from "../types/validation.type"
+import {ValidateElementOptionRecord} from "../types/validation"
 
 export class ValidateOptionDto {
   readonly #paramName: string

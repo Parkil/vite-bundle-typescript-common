@@ -1,5 +1,4 @@
-import {defineConfig} from "vite"
-import react from '@vitejs/plugin-react'
+import {defineConfig} from 'vite'
 
 export default defineConfig({
   build: {
@@ -8,22 +7,13 @@ export default defineConfig({
       entry: [
         "src/main.ts",
       ],
-      name: "Demo",
+      name: "Recoble Common Module",
       fileName: (format, name) => {
         if (format === "es") {
           return `${name}.js`;
         }
         return `${name}.${format}`;
       },
-    },
-    plugins: [react()],
-    rollupOptions: {
-      external: ["react"],
-      output: {
-        globals: {
-          react: 'React',
-        }
-      }
     },
   }
 });

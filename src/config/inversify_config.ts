@@ -1,4 +1,4 @@
-import "reflect-metadata"
+import "@abraham/reflection"
 import {Container} from "inversify"
 import {FindBrowserInfo} from "../browserinfo/find.browser.info"
 import {AxiosClient} from "../httpclient/axios.client"
@@ -27,10 +27,13 @@ import {SetPurchaseProduct} from "../userdata/impl/set.purchase.product"
 import {SetBasketProduct} from "../userdata/impl/set.basket.product"
 import {XhrClient} from "../httpclient/xhr.client"
 import {SetRegisterAccount} from "../userdata/impl/set.register.account"
-import {SetReviewSelector} from "../userdata/impl/set.review.selector"
+import {SetReviewSelector} from "../userdata/impl/set.review.selector.ts"
 import {ScrappingReview} from "../scrapping/scrapping.review"
 import {SetSearchWord} from "../userdata/impl/set.search.word"
 import {SetPageName} from "../userdata/impl/set.page.name"
+import {IndexedDbWrapper} from "../indexeddb/indexed.db.wrapper.ts"
+import {ManageLogData} from "../logdata/manage.log.data.ts"
+import {SetCompleteInfo} from "../logdata/set.complete.info.ts"
 
 const container = new Container()
 
@@ -65,5 +68,8 @@ container.bind<LoadEventDetail>('LoadEventDetail').to(LoadEventDetail)
 container.bind<UnLoadEventDetail>('UnLoadEventDetail').to(UnLoadEventDetail)
 container.bind<SendHttpRequest>('SendHttpRequest').to(SendHttpRequest)
 container.bind<ScrappingReview>('ScrappingReview').to(ScrappingReview)
+container.bind<IndexedDbWrapper>('IndexedDbWrapper').to(IndexedDbWrapper)
+container.bind<ManageLogData>('ManageLogData').to(ManageLogData)
+container.bind<SetCompleteInfo>('SetCompleteInfo').to(SetCompleteInfo)
 
 export default container

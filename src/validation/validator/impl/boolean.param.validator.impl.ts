@@ -1,7 +1,7 @@
 import {ValidateOptionDto, ValidateParamResultDto} from "../../../dtos"
 import {ParamValidator} from "../param.validator"
 import VALIDATE_ERROR_TYPE from "../../../enums/validate.error.type"
-import {ValidateTargetParam} from "../../../types/validation.type"
+import {ValidateTargetParam} from "../../../types/validation"
 
 export class BooleanParamValidatorImpl implements ParamValidator {
   isValid(optionDto: ValidateOptionDto, param: ValidateTargetParam): ValidateParamResultDto {

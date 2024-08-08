@@ -4,7 +4,7 @@ import DATA_TYPE from "../../enums/data.type"
 import {ValidateOptionRecord} from "../../types/validation"
 
 @injectable()
-export class SetRegisterDate extends SaveUserData {
+export class SetAccount extends SaveUserData {
 
   getValidateOption(): ValidateOptionRecord {
     return {
@@ -14,24 +14,24 @@ export class SetRegisterDate extends SaveUserData {
         min: 1,
         max: 90,
       },
-      register_date: {
+      account: {
         required: true,
-        dataType: DATA_TYPE.STRING,
+        dataType: DATA_TYPE.NUMBER,
         min: 1,
-        max: 10,
+        max: 99999999,
       }
     }
   }
 
   getIdentifier(): string {
-    return 'setRegisterDate'
+    return 'setAccount'
   }
 
   getDataKey(): string {
-    return 'registerDate'
+    return 'account'
   }
 
   getGroupKey(): string {
-    return 'user'
+    return "user"
   }
 }

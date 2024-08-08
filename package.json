@@ -1,5 +1,5 @@
 {
-  "name": "recoble-test-typescript",
+  "name": "recoble-common-module",
   "version": "0.0.1",
   "private": false,
   "type": "module",
@@ -8,6 +8,7 @@
   ],
   "main": "./dist/main.cjs",
   "module": "./dist/main.js",
+  "types": "./dist/main.d.ts",
   "exports": {
     ".": {
       "import": "./dist/main.js",
@@ -16,6 +17,8 @@
   },
   "scripts": {
     "dev": "vite",
+    "build:local": "vite build --mode mypc",
+    "build:local:mac": "vite build --mode mypc && cp /Users/ilpark/WebstormProjects/vite-bundle-typescript-common/dist/*.* /Users/ilpark/npm_local_package/recoble-common-module/dist",
     "build:local:win": "vite build --mode mypc && copy /y c:\\Dev\\js_workspace\\vite-bundle-typescript-react\\dist\\*.* c:\\npm-local-package\\recoble-test-typescript\\dist",
     "build:dev": "vite build --mode dev",
     "build:prod": "vite build --mode prod",
@@ -44,9 +47,5 @@
     "ts-jest-mock-import-meta": "^1.2.0",
     "ts-node": "^10.9.1",
     "vite": "^5.3.4"
-  },
-  "peerDependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
   }
 }

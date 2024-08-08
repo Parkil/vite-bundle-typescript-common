@@ -1,7 +1,7 @@
 import {injectable} from "inversify"
 import {SaveUserData} from "../save.user.data"
 import DATA_TYPE from "../../enums/data.type"
-import {ValidateOptionRecord} from "../../types/validation.type"
+import {ValidateOptionRecord} from "../../types/validation"
 
 @injectable()
 export class SetProductView extends SaveUserData {

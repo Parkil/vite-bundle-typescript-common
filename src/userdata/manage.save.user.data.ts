@@ -6,7 +6,7 @@ import {printErrorMsg} from "../util"
 @injectable()
 export class ManageSaveUserData {
 
-  @multiInject('SaveUserData') private saveUserDatas: SaveUserData[]
+  @multiInject('SaveUserData') private saveUserDatas!: SaveUserData[]
 
   save(dataArr: { [key: string]: any }[]): void {
     dataArr.forEach((data) => {

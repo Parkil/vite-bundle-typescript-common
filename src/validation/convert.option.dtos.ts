@@ -1,6 +1,6 @@
 import DATA_TYPE from "../enums/data.type"
 import {ValidateOptionDto} from "../dtos"
-import {ValidateOptionRecord} from "../types/validation.type"
+import {ValidateOptionRecord} from "../types/validation"
 
 export const convertOptionDtos = (options: ValidateOptionRecord): ValidateOptionDto[] => {
   return Object.keys(options).map((key) => convertOptionDto(key, options))

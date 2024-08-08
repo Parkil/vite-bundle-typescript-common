@@ -3,7 +3,7 @@ import {inject, injectable} from "inversify"
 
 @injectable()
 export class ChkMeetsConversion {
-  @inject('ManageConversionInfo') private manageConversionInfo: ManageConversionInfo
+  @inject('ManageConversionInfo') private manageConversionInfo!: ManageConversionInfo
 
 
   check(): boolean {

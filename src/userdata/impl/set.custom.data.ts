@@ -1,6 +1,6 @@
 import {injectable} from "inversify"
 import {SaveUserData} from "../save.user.data"
-import {ValidateOptionRecord} from "../../types/validation.type"
+import {ValidateOptionRecord} from "../../types/validation"
 
 @injectable()
 export class SetCustomData extends SaveUserData {

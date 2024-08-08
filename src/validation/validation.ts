@@ -6,7 +6,7 @@ import {StringParamValidatorImpl} from "./validator/impl/string.param.validator.
 import VALIDATE_ERROR_TYPE from "../enums/validate.error.type"
 import {InvalidKeyValidator} from "./validator/invalid.key.validator"
 import {BooleanParamValidatorImpl} from "./validator/impl/boolean.param.validator.impl"
-import {ValidateOptionRecord, ValidateTargetRecord} from "../types/validation.type"
+import {ValidateOptionRecord, ValidateTargetRecord} from "../types/validation"
 import {RecordArrayParamValidatorImpl} from "./validator/impl/record.array.param.validator.impl"
 
 export const validateMultiParam = (option: ValidateOptionRecord, targets: ValidateTargetRecord[]): string => {

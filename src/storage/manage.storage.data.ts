@@ -1,26 +1,26 @@
 import {inject, injectable} from "inversify"
 import {GenBrowserId} from "../generateid/gen.browser.id"
 import {
+  RECOBLE_API_KEY_KEY,
   RECOBLE_BROWSER_ID_KEY,
   RECOBLE_BROWSER_INFO_KEY,
-  RECOBLE_CONVERSION_INFO_KEY,
-  RECOBLE_PAGE_ACTIVITY_KEY,
-  RECOBLE_PAGE_START_DTM_KEY,
+  RECOBLE_CONVERSION_INFO_KEY, RECOBLE_HOSTNAME_KEY,
   RECOBLE_INCOMPLETE_LOG_INFO_KEY,
+  RECOBLE_PAGE_ACTIVITY_KEY,
+  RECOBLE_PAGE_START_DTM_KEY, RECOBLE_REVIEW_LIST_KEY, RECOBLE_SCROLL_LOC_KEY,
   RECOBLE_UNLOAD_EVENT_EXECUTED_KEY,
-  RECOBLE_USER_DATA_KEY,
-  RECOBLE_API_KEY_KEY
+  RECOBLE_URL_KEY
 } from "../constants/constants"
 import {BrowserInfoDto, PrevPageInfoDto} from "../dtos"
 import PAGE_ACTIVITY_TYPE from "../enums/page.activity.type"
-import {PageActivityType} from "../types/page.activity.type"
-import {emptyPageActivityObj, printErrorMsg, decryptAES, encryptAES, formatDate} from "../util"
+import {PageActivity} from "../types/page.activity"
+import {decryptAES, emptyPageActivityObj, encryptAES, formatDate, genRecobleUserDataKey, printErrorMsg} from "../util"
 import {Storage} from "./storage"
 
 @injectable()
 export class ManageStorageData {
   #storage: Storage
-  @inject('GenBrowserId') private genBrowserId: GenBrowserId
+  @inject('GenBrowserId') private genBrowserId!: GenBrowserId
   
   constructor() {
     this.#storage = new Storage()
@@ -81,7 +81,7 @@ export class ManageStorageData {
     this.#storage.setItem(RECOBLE_PAGE_ACTIVITY_KEY, JSON.stringify(storeData))
   }
 
-  findPageActivity(): PageActivityType {
+  findPageActivity(): PageActivity {
     const prevData = this.#storage.getItem(RECOBLE_PAGE_ACTIVITY_KEY)
     return (!prevData) ? emptyPageActivityObj() : JSON.parse(prevData)
   }
@@ -115,7 +115,8 @@ export class ManageStorageData {
     this.#storage.removeItem(RECOBLE_UNLOAD_EVENT_EXECUTED_KEY)
   }
 
-  setUserData(targetRecord: Record<string, any>, groupKey: string) {
+  setUserData(targetRecord: Record<string, any>, groupKey: string, currentUrlParam?: string) {
+
     let orgRecord = this.findUserData()
     let sourceRecord = orgRecord
 
@@ -128,28 +129,73 @@ export class ManageStorageData {
       }
     }
 
+
     Object.assign(sourceRecord, targetRecord)
 
     const secret = window.location.host
-    this.#storage.setItem(RECOBLE_USER_DATA_KEY, encryptAES(JSON.stringify(orgRecord), secret))
+    this.#storage.setItem(this.#findRecobleUserDataKey(currentUrlParam), encryptAES(JSON.stringify(orgRecord), secret))
   }
 
-  findUserData(): Record<string, any> {
+  findUserData(currentUrlParam?: string): Record<string, any> {
+    const prevData = this.#storage.getItem(this.#findRecobleUserDataKey(currentUrlParam))
     const secret = window.location.host
-    const prevData = this.#storage.getItem(RECOBLE_USER_DATA_KEY)
     return (!prevData) ? {} : JSON.parse(decryptAES(prevData, secret))
   }
 
-  clearUserData() {
-    this.#storage.removeItem(RECOBLE_USER_DATA_KEY)
+  clearUserData(currentUrlParam?: string) {
+    this.#storage.removeItem(this.#findRecobleUserDataKey(currentUrlParam))
+  }
+
+  #findRecobleUserDataKey(currentUrlParam?: string): string {
+    const currentUrl = currentUrlParam ?? this.findCurrentUrl()
+    return genRecobleUserDataKey(currentUrl)
   }
 
   setApiKey(apiKey: string): void {
-    console.log('apiKey: ', apiKey)
     this.#storage.setItem(RECOBLE_API_KEY_KEY, apiKey)
   }
 
   findApiKey(): string | null {
     return this.#storage.getItem(RECOBLE_API_KEY_KEY)
+  }
+
+  setCurrentUrl(url: string): void {
+    this.#storage.setItem(RECOBLE_URL_KEY, url)
+  }
+
+  findCurrentUrl(): string | null {
+    return this.#storage.getItem(RECOBLE_URL_KEY)
+  }
+
+  setCurrentHostName(domain: string): void {
+    this.#storage.setItem(RECOBLE_HOSTNAME_KEY, domain)
+  }
+
+  findCurrentHostName(): string | null {
+    return this.#storage.getItem(RECOBLE_HOSTNAME_KEY)
+  }
+
+  setReviewListStr(reviewListStr: string): void {
+    this.#storage.setItem(RECOBLE_REVIEW_LIST_KEY, reviewListStr)
+  }
+
+  findReviewListStr(): string | null {
+    return this.#storage.getItem(RECOBLE_REVIEW_LIST_KEY)
+  }
+
+  clearReviewListStr(): void {
+    this.#storage.removeItem(RECOBLE_REVIEW_LIST_KEY)
+  }
+
+  setScrollLoc(scrollLoc: string): void {
+    this.#storage.setItem(RECOBLE_SCROLL_LOC_KEY, scrollLoc)
+  }
+
+  findScrollLoc(): string | null {
+    return this.#storage.getItem(RECOBLE_SCROLL_LOC_KEY)
+  }
+
+  clearScrollLoc(): void {
+    this.#storage.removeItem(RECOBLE_SCROLL_LOC_KEY)
   }
 }
