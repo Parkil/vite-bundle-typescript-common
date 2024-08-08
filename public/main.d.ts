@@ -1,6 +1,10 @@
-export declare const runLoadEvent: () => void;
+export declare const runSpaLoadEvent: () => void;
 
-export declare const runUnloadEvent: (url: string) => void;
+export declare const runWebLoadEvent: () => void;
+
+export declare const runSpaUnloadEvent: (url: string) => void;
+
+export declare const runWebUnloadEvent: () => void;
 
 export declare const findReviewContents: (url: string) => void;
 

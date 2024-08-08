@@ -1,24 +1,35 @@
 import container from "./config/inversify_config"
-import {LoadEventDetail} from "./event/load.event.detail.ts"
 import {ManageSaveUserData} from "./userdata/manage.save.user.data.ts"
 import {ManageStorageData} from "./storage/manage.storage.data.ts"
-import {UnLoadEventDetail} from "./event/unload.event.detail.ts"
 import {ScrappingReview} from "./scrapping/scrapping.review.ts"
 import {printErrorMsg} from "./util"
+import {SpaLoadEvent} from "./event/impl/spa.load.event.ts"
+import {SpaUnloadEvent} from "./event/impl/spa.unload.event.ts"
+import {WebLoadEvent} from "./event/impl/web.load.event.ts"
+import {WebUnloadEvent} from "./event/impl/web.unload.event.ts"
 
-const loadEventDetail = container.get<LoadEventDetail>('LoadEventDetail')
-const unLoadEventDetail = container.get<UnLoadEventDetail>('UnLoadEventDetail')
+const spaLoadEvent = container.get<SpaLoadEvent>('SpaLoadEvent')
+const spaUnloadEvent = container.get<SpaUnloadEvent>('SpaUnloadEvent')
+const webLoadEvent = container.get<WebLoadEvent>('WebLoadEvent')
+const webUnloadEvent = container.get<WebUnloadEvent>('WebUnloadEvent')
 const manageSaveUserData = container.get<ManageSaveUserData>('ManageSaveUserData')
 const manageStorageData = container.get<ManageStorageData>('ManageStorageData')
 const scrappingReview = container.get<ScrappingReview>('ScrappingReview')
 
-
-export const runLoadEvent = () => {
-  loadEventDetail.onLoad()
+export const runSpaLoadEvent = () => {
+  spaLoadEvent.onload()
 }
 
-export const runUnloadEvent = (url: string) => {
-  unLoadEventDetail.onUnLoad(url)
+export const runWebLoadEvent = () => {
+  webLoadEvent.onload()
+}
+
+export const runSpaUnloadEvent = (url: string) => {
+  spaUnloadEvent.onUnload(url)
+}
+
+export const runWebUnloadEvent = () => {
+  webUnloadEvent.onUnload()
 }
 
 export const findReviewContents = (url: string) => {

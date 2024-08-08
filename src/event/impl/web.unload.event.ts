@@ -16,7 +16,7 @@ export class WebUnloadEvent implements UnloadEvent {
   @inject('SendHttpRequest') private sendHttpRequest!: SendHttpRequest
   @inject('ScrappingReview') private scrappingReview!: ScrappingReview
 
-  onUnload(_: string, __: UNLOAD_ENUM) {
+  onUnload(_?: string, __?: UNLOAD_ENUM) {
     // window sessionStorage 가 비동기 상황에서 정상적으로 작동하지 않는다
     if (this.manageStorageData.findUnloadEventExecuted() === 'true') {
       return
