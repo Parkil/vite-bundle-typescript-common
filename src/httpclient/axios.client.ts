@@ -19,6 +19,7 @@ export class AxiosClient {
 
   private send(url: string, method: HTTP_METHOD, headers: Record<string, string>, data?: object): Promise<AxiosResponse<any, any>> {
     const baseConfig = {
+      httpAgent: this.axiosHttpsAgent,
       httpsAgent: this.axiosHttpsAgent,
       url: url,
       method: method.toString(),

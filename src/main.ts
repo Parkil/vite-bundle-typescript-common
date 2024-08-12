@@ -88,11 +88,38 @@ export const insertSpaPageCloseEventScript = () => {
   }
 
   const script = document.createElement('script')
-  // script.src = `${import.meta.env.VITE_SPA_UNLOAD_SCRIPT_DOMAIN}/unload_script.js`
-  script.src = 'https://lab.bibly.kr/recoble_script/unload_script.js'
+  script.defer = true
   script.innerHTML = `
     // recoble script
-    console.log('recoble script')
+    let executed = false  
+  
+    window.addEventListener("beforeunload", () => {
+      if (!executed) {  
+        console.log('beforeunload run')  
+        window.setRecoblePageUnloadEvent()
+        executed = true  
+      }  
+    })  
+    
+    window.addEventListener("pagehide", () => {
+      if (!executed) {  
+        console.log('pagehide run')
+        window.setRecoblePageUnloadEvent()  
+        executed = true  
+      }  
+    })  
+    
+    document.addEventListener('visibilitychange', () => {
+      const visibilityState = document.visibilityState  
+    
+      if (visibilityState === 'hidden') {  
+        if (!executed) {  
+          console.log('visibilitychange run')
+          window.setRecoblePageUnloadEvent()  
+          executed = true  
+        }  
+      }  
+    })  
   `
   document.head.appendChild(script)
 }
