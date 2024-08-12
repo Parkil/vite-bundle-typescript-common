@@ -20,5 +20,9 @@ export declare const insertSpaPageCloseEventScript: () => void;
 
 export declare const errorMsg: (msg: string) => void;
 
+export declare const setWindowEvent: (eventName: string, listener: Function) => void;
+
+export declare const setDocumentEvent: (eventName: string, listener: Function) => void;
+
 
 

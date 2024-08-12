@@ -2,7 +2,7 @@ import container from "./config/inversify_config"
 import {ManageSaveUserData} from "./userdata/manage.save.user.data.ts"
 import {ManageStorageData} from "./storage/manage.storage.data.ts"
 import {ScrappingReview} from "./scrapping/scrapping.review.ts"
-import {printErrorMsg} from "./util"
+import {chkBrowserIsValid, printErrorMsg} from "./util"
 import {SpaLoadEvent} from "./event/impl/spa.load.event.ts"
 import {SpaUnloadEvent} from "./event/impl/spa.unload.event.ts"
 import {WebLoadEvent} from "./event/impl/web.load.event.ts"
@@ -92,4 +92,22 @@ export const insertSpaPageCloseEventScript = () => {
 
 export const errorMsg = (msg: string) => {
   printErrorMsg(msg)
+}
+
+export const setWindowEvent = (eventName: string, listener: Function) => {
+  if (!chkBrowserIsValid()) {
+    printErrorMsg("웹 브라우저 환경이 아닙니다")
+    return
+  }
+
+  window.addEventListener(eventName, listener as EventListener)
+}
+
+export const setDocumentEvent = (eventName: string, listener: Function) => {
+  if (!chkBrowserIsValid()) {
+    printErrorMsg("웹 브라우저 환경이 아닙니다")
+    return
+  }
+
+  document.addEventListener(eventName, listener as EventListener)
 }
