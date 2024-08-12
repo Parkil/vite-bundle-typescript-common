@@ -7,6 +7,7 @@ import {SpaLoadEvent} from "./event/impl/spa.load.event.ts"
 import {SpaUnloadEvent} from "./event/impl/spa.unload.event.ts"
 import {WebLoadEvent} from "./event/impl/web.load.event.ts"
 import {WebUnloadEvent} from "./event/impl/web.unload.event.ts"
+import {UNLOAD_ENUM} from "./enums/unload.type.ts";
 
 const spaLoadEvent = container.get<SpaLoadEvent>('SpaLoadEvent')
 const spaUnloadEvent = container.get<SpaUnloadEvent>('SpaUnloadEvent')
@@ -24,8 +25,12 @@ export const runWebLoadEvent = () => {
   webLoadEvent.onload()
 }
 
+export const runSpaUnMountEvent = (url: string) => {
+  spaUnloadEvent.onUnload(url, UNLOAD_ENUM.PAGE_UNMOUNT)
+}
+
 export const runSpaUnloadEvent = (url: string) => {
-  spaUnloadEvent.onUnload(url)
+  spaUnloadEvent.onUnload(url, UNLOAD_ENUM.PAGE_UNLOAD)
 }
 
 export const runWebUnloadEvent = () => {
@@ -83,6 +88,8 @@ export const insertSpaPageCloseEventScript = () => {
   }
 
   const script = document.createElement('script')
+  // script.src = `${import.meta.env.VITE_SPA_UNLOAD_SCRIPT_DOMAIN}/unload_script.js`
+  script.src = 'https://lab.bibly.kr/recoble_script/unload_script.js'
   script.innerHTML = `
     // recoble script
     console.log('recoble script')

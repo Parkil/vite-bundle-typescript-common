@@ -1,8 +1,12 @@
 export declare const runSpaLoadEvent: () => void;
 
+export declare const runSpaLoadEvent: () => void;
+
 export declare const runWebLoadEvent: () => void;
 
 export declare const runSpaUnloadEvent: (url: string) => void;
+
+export declare const runSpaUnMountEvent: (url: string) => void;
 
 export declare const runWebUnloadEvent: () => void;
 
