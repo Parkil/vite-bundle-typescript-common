@@ -7,7 +7,6 @@ import {SpaLoadEvent} from "./event/impl/spa.load.event.ts"
 import {SpaUnloadEvent} from "./event/impl/spa.unload.event.ts"
 import {WebLoadEvent} from "./event/impl/web.load.event.ts"
 import {WebUnloadEvent} from "./event/impl/web.unload.event.ts"
-import {UNLOAD_ENUM} from "./enums/unload.type.ts";
 
 const spaLoadEvent = container.get<SpaLoadEvent>('SpaLoadEvent')
 const spaUnloadEvent = container.get<SpaUnloadEvent>('SpaUnloadEvent')
@@ -26,11 +25,11 @@ export const runWebLoadEvent = () => {
 }
 
 export const runSpaUnMountEvent = (url: string) => {
-  spaUnloadEvent.onUnload(url, UNLOAD_ENUM.PAGE_UNMOUNT)
+  spaUnloadEvent.onUnMount(url)
 }
 
 export const runSpaUnloadEvent = (url: string) => {
-  spaUnloadEvent.onUnload(url, UNLOAD_ENUM.PAGE_UNLOAD)
+  spaUnloadEvent.onUnload(url)
 }
 
 export const runWebUnloadEvent = () => {
@@ -68,12 +67,12 @@ export const saveUserData = (paramArr: { [key: string]: any }[]) => {
   manageSaveUserData.save(paramArr)
 }
 
-const isScriptInserted = (): boolean => {
+const isScriptInserted = (uniqueStr: string): boolean => {
   const scriptTags = document.getElementsByTagName('script')
   let isScriptInserted: boolean = false
 
   for(const element of scriptTags) {
-    if (element.innerHTML.indexOf('recoble script') !== -1) {
+    if (element.innerHTML.indexOf(uniqueStr) !== -1) {
       isScriptInserted = true
     }
   }
@@ -81,46 +80,15 @@ const isScriptInserted = (): boolean => {
   return isScriptInserted
 }
 
-export const insertSpaPageCloseEventScript = () => {
+export const insertSpaPageCloseEventScript = (scriptContent: string, uniqueStr: string) => {
 
-  if (isScriptInserted()) {
+  if (isScriptInserted(uniqueStr)) {
     return
   }
 
   const script = document.createElement('script')
   script.defer = true
-  script.innerHTML = `
-    // recoble script
-    let executed = false  
-  
-    window.addEventListener("beforeunload", () => {
-      if (!executed) {  
-        console.log('beforeunload run')  
-        window.setRecoblePageUnloadEvent()
-        executed = true  
-      }  
-    })  
-    
-    window.addEventListener("pagehide", () => {
-      if (!executed) {  
-        console.log('pagehide run')
-        window.setRecoblePageUnloadEvent()  
-        executed = true  
-      }  
-    })  
-    
-    document.addEventListener('visibilitychange', () => {
-      const visibilityState = document.visibilityState  
-    
-      if (visibilityState === 'hidden') {  
-        if (!executed) {  
-          console.log('visibilitychange run')
-          window.setRecoblePageUnloadEvent()  
-          executed = true  
-        }  
-      }  
-    })  
-  `
+  script.innerHTML = scriptContent
   document.head.appendChild(script)
 }
 

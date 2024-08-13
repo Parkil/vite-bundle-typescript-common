@@ -1,6 +1,5 @@
 import {UnloadEvent} from "../unload.event.ts"
 import {inject, injectable} from "inversify"
-import {UNLOAD_ENUM} from "../../enums/unload.type.ts"
 import {ManageStorageData} from "../../storage/manage.storage.data.ts"
 import {ChkMeetsConversion} from "../../conversion/chk.meets.conversion.ts"
 import {ManageLogData} from "../../logdata/manage.log.data.ts"
@@ -14,22 +13,21 @@ export class SpaUnloadEvent implements UnloadEvent {
   @inject('ChkMeetsConversion') private chkMeetsConversion!: ChkMeetsConversion
   @inject('ManageLogData') private manageLogData!: ManageLogData
 
-  onUnload(currentUrl: string, unloadType: UNLOAD_ENUM = UNLOAD_ENUM.PAGE_UNMOUNT) {
+  onUnMount(currentUrl: string) {
+    this.manageLogData.addUnMountLog(this.#assemblyData(currentUrl)).then(() => {})
+    this.#postProcess(currentUrl)
+  }
 
-    if (unloadType === UNLOAD_ENUM.PAGE_UNLOAD && this.manageStorageData.findUnloadEventExecuted() === 'true') {
-      return
-    }
+  onUnload(currentUrl: string) {
+    this.manageLogData.addUnloadLog(this.#assemblyData(currentUrl))
+    this.#postProcess(currentUrl)
+  }
 
+  #postProcess(currentUrl: string): void {
     // todo 전환정보 충족여부 확인 (현재는 임시 구현이며 나중에 변경될 수 있다)
     this.chkMeetsConversion.check()
-    const logData = this.#assemblyData(currentUrl)
-    this.manageLogData.addLog(logData, unloadType).then(() => {})
     this.manageStorageData.clearUserData(currentUrl)
     this.manageStorageData.clearReviewListStr()
-
-    if (unloadType === UNLOAD_ENUM.PAGE_UNLOAD) {
-      this.manageStorageData.setUnloadEventExecuted()
-    }
   }
 
   #assemblyData(currentUrl: string): LogData {

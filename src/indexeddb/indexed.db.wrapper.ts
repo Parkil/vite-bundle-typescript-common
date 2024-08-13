@@ -1,8 +1,26 @@
 import {injectable} from "inversify"
 import {IndexedDBOption} from "../types/indexed.db"
+import {INDEXED_DB_LAST_LOG, INDEXED_DB_LOG_DETAIL} from "../constants/constants.ts";
+import {LogData} from "../types/log.data";
 
 @injectable()
 export class IndexedDbWrapper {
+
+  connectRecobleDB(): Promise<IDBDatabase> {
+    const options = [
+      {
+        'storeName': INDEXED_DB_LOG_DETAIL,
+        'subOption': {keyPath: 'id', autoIncrement: true}
+      },
+      {
+        'storeName': INDEXED_DB_LAST_LOG,
+        'subOption': {keyPath: 'id', autoIncrement: true}
+      }
+    ]
+
+    return this.connectIndexedDB('RecobleDB', 1, options)
+  }
+
   connectIndexedDB(dbName: string, version: number, options?: IndexedDBOption[]): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(dbName, version)
@@ -40,7 +58,14 @@ export class IndexedDbWrapper {
     })
   }
 
-  findAll(db: IDBDatabase, objectStoreName: string): Promise<any>{
+  async findAllAndClear(db: IDBDatabase, objectStoreName: string): Promise<any> {
+    const list: LogData[] = await this.findAll(db, objectStoreName)
+    await this.clearAll(db, objectStoreName)
+
+    return list
+  }
+
+  findAll(db: IDBDatabase, objectStoreName: string): Promise<LogData[]>{
     return new Promise((resolve, reject) => {
       const request = db.transaction([objectStoreName], 'readonly').objectStore(objectStoreName).getAll()
 

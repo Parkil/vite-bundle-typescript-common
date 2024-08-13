@@ -4,10 +4,16 @@ import {
   RECOBLE_API_KEY_KEY,
   RECOBLE_BROWSER_ID_KEY,
   RECOBLE_BROWSER_INFO_KEY,
-  RECOBLE_CONVERSION_INFO_KEY, RECOBLE_HOSTNAME_KEY,
+  RECOBLE_CONVERSION_INFO_KEY,
+  RECOBLE_HOSTNAME_KEY,
   RECOBLE_INCOMPLETE_LOG_INFO_KEY,
+  RECOBLE_IS_INDEXED_DB_INIT_KEY,
+  RECOBLE_LAST_LOG_LIST_KEY,
+  RECOBLE_LOG_DETAIL_LIST_KEY,
   RECOBLE_PAGE_ACTIVITY_KEY,
-  RECOBLE_PAGE_START_DTM_KEY, RECOBLE_REVIEW_LIST_KEY, RECOBLE_SCROLL_LOC_KEY,
+  RECOBLE_PAGE_START_DTM_KEY,
+  RECOBLE_REVIEW_LIST_KEY,
+  RECOBLE_SCROLL_LOC_KEY,
   RECOBLE_UNLOAD_EVENT_EXECUTED_KEY,
   RECOBLE_URL_KEY
 } from "../constants/constants"
@@ -16,6 +22,7 @@ import PAGE_ACTIVITY_TYPE from "../enums/page.activity.type"
 import {PageActivity} from "../types/page.activity"
 import {decryptAES, emptyPageActivityObj, encryptAES, formatDate, genRecobleUserDataKey, printErrorMsg} from "../util"
 import {Storage} from "./storage"
+import {LogData} from "../types/log.data";
 
 @injectable()
 export class ManageStorageData {
@@ -197,5 +204,47 @@ export class ManageStorageData {
 
   clearScrollLoc(): void {
     this.#storage.removeItem(RECOBLE_SCROLL_LOC_KEY)
+  }
+
+  setLogDetailList(list: LogData[]) {
+    this.#storage.setItem(RECOBLE_LOG_DETAIL_LIST_KEY, JSON.stringify(list))
+  }
+
+  findLogDetailList(): LogData[] {
+    const rawStr = this.#storage.getItem(RECOBLE_LOG_DETAIL_LIST_KEY)
+
+    if (!rawStr) {
+      return []
+    } else {
+      return JSON.parse(rawStr)
+    }
+  }
+
+  setLastLogList(list: LogData[]) {
+    this.#storage.setItem(RECOBLE_LAST_LOG_LIST_KEY, JSON.stringify(list))
+  }
+
+  findLastLogList(): LogData[] {
+    const rawStr = this.#storage.getItem(RECOBLE_LAST_LOG_LIST_KEY)
+
+    if (!rawStr) {
+      return []
+    } else {
+      return JSON.parse(rawStr)
+    }
+  }
+
+  setIsIndexedDBInit(val: boolean) {
+    this.#storage.setItem(RECOBLE_IS_INDEXED_DB_INIT_KEY, String(val))
+  }
+
+  findIsIndexedDBInit(): boolean {
+    const strValue = this.#storage.getItem(RECOBLE_IS_INDEXED_DB_INIT_KEY)
+
+    if (!strValue) {
+      return false
+    } else {
+      return Boolean(strValue)
+    }
   }
 }

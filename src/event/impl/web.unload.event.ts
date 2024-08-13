@@ -4,7 +4,6 @@ import {ManageStorageData} from "../../storage/manage.storage.data.ts"
 import {ChkMeetsConversion} from "../../conversion/chk.meets.conversion.ts"
 import {SendHttpRequest} from "../../sendhttprequest/send.http.request.ts"
 import {ScrappingReview} from "../../scrapping/scrapping.review.ts"
-import {UNLOAD_ENUM} from "../../enums/unload.type.ts"
 import {calcScrollLoc, findApiKeyHeader, formatDate} from "../../util"
 import PAGE_ACTIVITY_TYPE from "../../enums/page.activity.type.ts"
 import {PageActivity} from "../../types/page.activity"
@@ -17,7 +16,7 @@ export class WebUnloadEvent implements UnloadEvent {
   @inject('SendHttpRequest') private sendHttpRequest!: SendHttpRequest
   @inject('ScrappingReview') private scrappingReview!: ScrappingReview
 
-  onUnload(_?: string, __?: UNLOAD_ENUM) {
+  onUnload(_?: string) {
     // window sessionStorage 가 비동기 상황에서 정상적으로 작동하지 않는다
     if (this.manageStorageData.findUnloadEventExecuted() === 'true') {
       return

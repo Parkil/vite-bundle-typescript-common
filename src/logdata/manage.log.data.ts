@@ -6,12 +6,14 @@ import {SetCompleteInfo} from "./set.complete.info.ts"
 import {LogData} from "../types/log.data"
 import {SendHttpRequest} from "../sendhttprequest/send.http.request.ts"
 import {UNLOAD_ENUM} from "../enums/unload.type.ts"
+import {ManageStorageData} from "../storage/manage.storage.data.ts";
 
 @injectable()
 export class ManageLogData {
   @inject('IndexedDbWrapper') private indexedDbWrapper!: IndexedDbWrapper
   @inject('SetCompleteInfo') private setCompleteInfo!: SetCompleteInfo
   @inject('SendHttpRequest') private sendHttpRequest!: SendHttpRequest
+  @inject('ManageStorageData') private manageStorageData!: ManageStorageData
 
   /*
     0. INDEXED_DB_LOG_DETAIL 에 데이터 추가
@@ -29,10 +31,9 @@ export class ManageLogData {
         2.2.4. 2-2-2 리스트의 마지막 값을 가져와서 INDEXED_DB_LAST_LOG 에 저장
         2.2.5. 로그서버에 데이터 전송
         2.2.6. INDEXED_DB_LOG_DETAIL clear
-        2.2.7. unloadType 이 PAGE_UNLOAD 일 경우 INDEXED_DB_LAST_LOG clear
      */
-  async addLog(logData: LogData, unloadType: UNLOAD_ENUM): Promise<void> {
-    const database: IDBDatabase = await this.#connectDB()
+  async addUnMountLog(logData: LogData): Promise<void> {
+    const database: IDBDatabase = await this.indexedDbWrapper.connectRecobleDB()
     const addDataResult = await this.indexedDbWrapper.addData(database, INDEXED_DB_LOG_DETAIL, logData)
 
     if (!addDataResult) {
@@ -42,41 +43,28 @@ export class ManageLogData {
 
     const logDetailList = await this.indexedDbWrapper.findAll(database, INDEXED_DB_LOG_DETAIL)
 
-    if (logDetailList.length !== 0 && logDetailList.length >= unloadType.capacity) {
-      const lastLogList = await this.indexedDbWrapper.findAll(database, INDEXED_DB_LAST_LOG)
+    if (logDetailList.length !== 0 && logDetailList.length >= UNLOAD_ENUM.PAGE_UNMOUNT.capacity) {
+      const lastLogList = await this.indexedDbWrapper.findAllAndClear(database, INDEXED_DB_LAST_LOG)
       const concatList = [...lastLogList, ...logDetailList]
 
-      const completeList = await this.setCompleteInfo.setInfo(concatList)
+      const completeList = await this.setCompleteInfo.setInfoAsync(concatList)
 
-      await this.indexedDbWrapper.clearAll(database, INDEXED_DB_LAST_LOG)
       const lastElement = concatList[completeList.length - 1]
       lastElement.lastLogFlag = true
       await this.indexedDbWrapper.addData(database, INDEXED_DB_LAST_LOG, lastElement)
 
-      const userAgentStr = completeList[0].userAgent
-      const apiKeyHeader = findApiKeyHeader()
-
       await this.indexedDbWrapper.clearAll(database, INDEXED_DB_LOG_DETAIL)
-      if (unloadType === UNLOAD_ENUM.PAGE_UNLOAD) {
-        await this.indexedDbWrapper.clearAll(database, INDEXED_DB_LAST_LOG)
-      }
-
-      await this.sendHttpRequest.sendLog(LOG_SERVER_SEND_LOGS_URL, completeList, userAgentStr, apiKeyHeader)
+      await this.sendHttpRequest.sendLog(LOG_SERVER_SEND_LOGS_URL, completeList, logData.userAgent, findApiKeyHeader())
     }
   }
 
-  async #connectDB(): Promise<IDBDatabase> {
-    const options = [
-      {
-        'storeName': INDEXED_DB_LOG_DETAIL,
-        'subOption': {keyPath: 'id', autoIncrement: true}
-      },
-      {
-        'storeName': INDEXED_DB_LAST_LOG,
-        'subOption': {keyPath: 'id', autoIncrement: true}
-      }
-    ]
+  addUnloadLog(logData: LogData): void {
+    let logDetailList = this.manageStorageData.findLogDetailList()
+    const lastLogList = this.manageStorageData.findLastLogList()
 
-    return this.indexedDbWrapper.connectIndexedDB('RecobleDB', 1, options)
+    logDetailList = [...logDetailList, logData]
+    const concatList = [...lastLogList, ...logDetailList]
+    const completeList = this.setCompleteInfo.setInfoSync(concatList)
+    this.sendHttpRequest.sendLog(LOG_SERVER_SEND_LOGS_URL, completeList, logData.userAgent, findApiKeyHeader()).then(() => {})
   }
 }

@@ -3,7 +3,11 @@ import {LogData} from "../types/log.data"
 
 @injectable()
 export class SetCompleteInfo {
-  async setInfo(rawList: LogData[]): Promise<LogData[]> {
+  async setInfoAsync(rawList: LogData[]): Promise<LogData[]> {
+    return Promise.resolve(this.setInfoSync(rawList))
+  }
+
+  setInfoSync(rawList: LogData[]): LogData[] {
     const completeInfoList: LogData[] = []
     rawList.forEach((item, index, list) => {
       const prevElement = list[index - 1]
